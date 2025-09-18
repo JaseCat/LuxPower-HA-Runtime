@@ -1,0 +1,28 @@
+{
+  "name": "house-battery-runtime-calculator",
+  "version": "1.0.0",
+  "description": "Home Assistant custom card for calculating battery runtime and charge time",
+  "main": "battery-runtime-calculator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/house-battery-runtime-calculator.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "battery",
+    "runtime",
+    "charge-time",
+    "solar",
+    "inverter",
+    "luxpower"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/your-username/house-battery-runtime-calculator/issues"
+  },
+  "homepage": "https://github.com/your-username/house-battery-runtime-calculator#readme"
+}
