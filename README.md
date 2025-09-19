@@ -8,9 +8,19 @@ A custom Home Assistant card that calculates and displays battery runtime and ch
 - ⏱️ **Runtime Calculation**: Accurate estimation of remaining runtime based on battery discharge power
 - 🔌 **Charge Time Calculation**: Shows how long it will take to fully charge your battery
 - 📊 **Smart Display**: Shows runtime when discharging, charge time when charging
-- 🔧 **Configurable**: Customize which information to display
+- 🎛️ **Complete Customization**: Turn on/off any component individually
+- 📈 **Battery Graph**: Visual progress bar showing battery level
 - 🎨 **Modern UI**: Clean, responsive design that matches Home Assistant's theme
 - ⚠️ **Smart Warnings**: Alerts for low battery and configuration issues
+- 📱 **Compact Design**: Optimized for small spaces with configurable sizing
+
+## Screenshot
+
+Here's how the card looks with all components enabled:
+
+![House Battery Runtime Calculator - Full View](screenshot-full-card.png)
+
+*Example showing a fully charged battery system with solar generation, grid export, and all monitoring components active.*
 
 ## Installation
 
@@ -80,21 +90,39 @@ update_interval: 30  # seconds
 
 ### Configuration Options
 
+#### Required Options
+| Option | Type | Description |
+|--------|------|-------------|
+| `battery_entity` | string | Entity ID for battery level (percentage) |
+| `power_entity` | string | Entity ID for power consumption (watts) |
+
+#### Optional Entity Options
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `battery_entity` | string | **Required** | Entity ID for battery level (percentage) |
-| `power_entity` | string | **Required** | Entity ID for power consumption (watts) |
-| `generation_entity` | string | optional | Entity ID for solar generation (watts) |
-| `grid_charging_entity` | string | optional | Entity ID for grid charging power (watts) |
-| `battery_power_entity` | string | optional | Entity ID for battery power flow (positive=discharge, negative=charge) |
-| `battery_charging_entity` | string | optional | Entity ID for battery charging power (watts) |
-| `battery_discharging_entity` | string | optional | Entity ID for battery discharging power (watts) |
+| `generation_entity` | string | - | Entity ID for solar generation (watts) |
+| `grid_charging_entity` | string | - | Entity ID for grid charging power (watts) |
+| `battery_power_entity` | string | - | Entity ID for battery power flow (positive=discharge, negative=charge) |
+| `battery_charging_entity` | string | - | Entity ID for battery charging power (watts) |
+| `battery_discharging_entity` | string | - | Entity ID for battery discharging power (watts) |
+
+#### Display Control Options
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
 | `name` | string | "House Battery" | Card title |
 | `battery_capacity` | number | auto-detect | Battery capacity in kWh |
-| `show_power` | boolean | true | Show power consumption |
-| `show_capacity` | boolean | true | Show battery capacity |
-| `show_runtime` | boolean | true | Show estimated runtime |
-| `show_charge_time` | boolean | true | Show charge time remaining |
+| `show_title` | boolean | true | Show card title/header |
+| `show_battery_icon` | boolean | true | Show battery icon with fill |
+| `show_battery_percentage` | boolean | true | Show battery percentage text |
+| `show_capacity` | boolean | true | Show battery capacity (kWh) |
+| `show_battery_graph` | boolean | true | Show battery level with visual progress bar |
+| `show_house_usage` | boolean | true | Show house power usage box |
+| `show_battery_discharge` | boolean | true | Show battery discharge power box |
+| `show_battery_charge` | boolean | true | Show battery charge power box |
+| `show_solar` | boolean | true | Show solar generation box |
+| `show_grid_power` | boolean | true | Show grid import/export box |
+| `show_runtime` | boolean | true | Show battery runtime remaining |
+| `show_charge_time` | boolean | true | Show battery charge time remaining |
+| `show_last_update` | boolean | true | Show last updated timestamp |
 | `update_interval` | number | 30 | Update interval in seconds |
 
 ## Required Entities
@@ -200,9 +228,80 @@ Possible causes:
 3. **Incorrect capacity**: Battery capacity might be set too low
 4. **Wrong power entity**: You might be monitoring the wrong power sensor
 
-## Customization
+## Customization Examples
 
-### Styling
+### Minimal Battery Monitor (Just Runtime)
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.battery_level
+power_entity: sensor.house_power
+show_title: false
+show_battery_icon: false
+show_battery_percentage: false
+show_capacity: false
+show_house_usage: false
+show_battery_discharge: false
+show_battery_charge: false
+show_solar: false
+show_grid_power: false
+show_last_update: false
+show_charge_time: false
+```
+
+### Battery Graph Only
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.battery_level
+power_entity: sensor.house_power
+show_title: false
+show_battery_icon: false
+show_battery_percentage: false
+show_capacity: false
+show_house_usage: false
+show_battery_discharge: false
+show_battery_charge: false
+show_solar: false
+show_grid_power: false
+show_runtime: false
+show_charge_time: false
+show_last_update: false
+```
+
+### Power Monitoring Dashboard
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.battery_level
+power_entity: sensor.house_power
+generation_entity: sensor.solar_power
+grid_charging_entity: sensor.grid_power
+show_title: false
+show_battery_icon: false
+show_battery_percentage: false
+show_capacity: false
+show_runtime: false
+show_charge_time: false
+show_last_update: false
+```
+
+### Compact Battery + Runtime
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.battery_level
+power_entity: sensor.house_power
+show_title: false
+show_battery_icon: false
+show_battery_percentage: false
+show_capacity: false
+show_house_usage: false
+show_battery_discharge: false
+show_battery_charge: false
+show_solar: false
+show_grid_power: false
+show_last_update: false
+show_charge_time: false
+```
+
+## Styling
 
 The card uses Home Assistant's CSS variables for theming. It will automatically adapt to:
 - Light/dark themes

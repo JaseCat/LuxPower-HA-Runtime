@@ -24,19 +24,71 @@ lovelace:
   battery_charging_entity: sensor.battery_charge_power
   battery_discharging_entity: sensor.battery_discharge_power
   battery_capacity: 13.5  # kWh
-  show_power: true
+  show_title: true
+  show_battery_icon: true
+  show_battery_percentage: true
   show_capacity: true
+  show_battery_graph: true
+  show_house_usage: true
+  show_battery_discharge: true
+  show_battery_charge: true
+  show_solar: true
+  show_grid_power: true
   show_runtime: true
   show_charge_time: true
+  show_last_update: true
   update_interval: 30
 
 # Minimal configuration (only runtime)
 - type: custom:battery-runtime-calculator
   battery_entity: sensor.battery_level
   power_entity: sensor.home_power_consumption
-  show_power: false
+  show_title: false
+  show_battery_icon: false
+  show_battery_percentage: false
   show_capacity: false
+  show_battery_graph: false
+  show_house_usage: false
+  show_battery_discharge: false
+  show_battery_charge: false
+  show_solar: false
+  show_grid_power: false
+  show_last_update: false
+  show_charge_time: false
   show_runtime: true
+
+# Battery graph only
+- type: custom:battery-runtime-calculator
+  battery_entity: sensor.battery_level
+  power_entity: sensor.home_power_consumption
+  show_title: false
+  show_battery_icon: false
+  show_battery_percentage: false
+  show_capacity: false
+  show_house_usage: false
+  show_battery_discharge: false
+  show_battery_charge: false
+  show_solar: false
+  show_grid_power: false
+  show_runtime: false
+  show_charge_time: false
+  show_last_update: false
+  show_battery_graph: true
+
+# Power monitoring dashboard
+- type: custom:battery-runtime-calculator
+  battery_entity: sensor.battery_level
+  power_entity: sensor.home_power_consumption
+  generation_entity: sensor.solar_power
+  grid_charging_entity: sensor.grid_power
+  show_title: false
+  show_battery_icon: false
+  show_battery_percentage: false
+  show_capacity: false
+  show_runtime: false
+  show_charge_time: false
+  show_last_update: false
+  show_battery_graph: false
 
 # Example with different battery systems
 
