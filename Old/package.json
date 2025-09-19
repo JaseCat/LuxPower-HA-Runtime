@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JaseCat/LuxPower-HA-Runtime.git"
+    "url": "git+https://github.com/your-username/house-battery-runtime-calculator.git"
   },
   "keywords": [
     "home-assistant",
@@ -19,10 +19,10 @@
     "inverter",
     "luxpower"
   ],
-  "author": "JaseCat",
+  "author": "Your Name",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JaseCat/LuxPower-HA-Runtime/issues"
+    "url": "https://github.com/your-username/house-battery-runtime-calculator/issues"
   },
-  "homepage": "https://github.com/JaseCat/LuxPower-HA-Runtime#readme"
+  "homepage": "https://github.com/your-username/house-battery-runtime-calculator#readme"
 }

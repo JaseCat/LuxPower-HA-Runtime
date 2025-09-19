@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Initial release of House Battery Runtime Calculator
-- Battery runtime calculation based on battery discharge power
+- Battery runtime calculation based on current power consumption
 - Charge time calculation for solar and grid charging
 - Smart display logic (shows runtime when discharging, charge time when charging)
 - Visual battery indicator with color-coded status
@@ -16,13 +16,12 @@ All notable changes to this project will be documented in this file.
 - Real-time updates with configurable intervals
 
 ### Features
-- **Runtime Calculation**: Accurate estimation of remaining runtime based on battery discharge power
+- **Runtime Calculation**: Accurate estimation of remaining runtime
 - **Charge Time Calculation**: Shows time to fully charge from solar and grid
 - **Smart Display**: Automatically shows relevant information based on battery state
 - **Grid Charging Support**: Accounts for house consumption when calculating grid charging
 - **Visual Indicators**: Color-coded battery status and warnings
 - **Configurable**: Customizable display options and update intervals
-- **Multiple Battery Systems**: Support for LuxPower, Tesla Powerwall, SolarEdge, and generic systems
 
 ### Technical Details
 - Built as a Home Assistant custom card

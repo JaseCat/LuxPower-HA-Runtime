@@ -5,12 +5,13 @@ A custom Home Assistant card that calculates and displays battery runtime and ch
 ## Features
 
 - 🔋 **Real-time Battery Monitoring**: Visual battery indicator with color-coded status
-- ⏱️ **Runtime Calculation**: Accurate estimation of remaining runtime based on battery discharge power
+- ⏱️ **Runtime Calculation**: Accurate estimation of remaining runtime based on current power consumption
 - 🔌 **Charge Time Calculation**: Shows how long it will take to fully charge your battery
 - 📊 **Smart Display**: Shows runtime when discharging, charge time when charging
 - 🔧 **Configurable**: Customize which information to display
 - 🎨 **Modern UI**: Clean, responsive design that matches Home Assistant's theme
 - ⚠️ **Smart Warnings**: Alerts for low battery and configuration issues
+
 
 ## Installation
 
@@ -24,11 +25,13 @@ A custom Home Assistant card that calculates and displays battery runtime and ch
 3. Add the resource to your Home Assistant configuration:
 
    **Method A: Using the UI (Recommended)**
-   1. Go to **Settings** → **Dashboards** → **Resources**
-   2. Click **+ Add Resource**
-   3. Enter: `/local/battery-runtime-calculator.js`
-   4. Set type to: `JavaScript Module`
-   5. Click **Create**
+   1. Go to **Settings** → **Devices & Services** → **Helpers**
+   2. Click the **+** button and select **Add Integration**
+   3. Search for "Lovelace Resources" or go to **Settings** → **Dashboards** → **Resources**
+   4. Click **+ Add Resource**
+   5. Enter: `/local/battery-runtime-calculator.js`
+   6. Set type to: `JavaScript Module`
+   7. Click **Create**
 
    **Method B: Using configuration.yaml (Legacy)**
    ```yaml
@@ -123,55 +126,17 @@ Example entities:
 The card calculates runtime using this formula:
 
 ```
-Runtime (hours) = (Battery Level % / 100) × Battery Capacity (kWh) / Battery Discharge Power (kW)
+Runtime (hours) = (Battery Level % / 100) × Battery Capacity (kWh) / Power Consumption (kW)
 ```
 
 ### Example Calculation
 
 - Battery Level: 75%
 - Battery Capacity: 13.5 kWh
-- Battery Discharge: 2.5 kW
+- Power Consumption: 2.5 kW
 
 ```
 Runtime = (75 / 100) × 13.5 / 2.5 = 4.05 hours = 4h 3m
-```
-
-## Integration Examples
-
-### With LuxPower (Recommended)
-```yaml
-type: custom:battery-runtime-calculator
-battery_entity: sensor.luxpower_battery_soc
-power_entity: sensor.luxpower_load_power
-generation_entity: sensor.luxpower_solar_power
-grid_charging_entity: sensor.luxpower_grid_power
-battery_charging_entity: sensor.luxpower_battery_charge_power
-battery_discharging_entity: sensor.luxpower_battery_discharge_power
-battery_capacity: 23.8
-```
-
-### With SolarEdge
-```yaml
-type: custom:battery-runtime-calculator
-battery_entity: sensor.solaredge_battery_level
-power_entity: sensor.solaredge_consumption
-battery_capacity: 13.5
-```
-
-### With Tesla Powerwall
-```yaml
-type: custom:battery-runtime-calculator
-battery_entity: sensor.powerwall_battery_level
-power_entity: sensor.powerwall_load
-battery_capacity: 13.5
-```
-
-### With Generic Battery Monitor
-```yaml
-type: custom:battery-runtime-calculator
-battery_entity: sensor.battery_percentage
-power_entity: sensor.total_power_usage
-battery_capacity: 10.0
 ```
 
 ## Troubleshooting
@@ -219,6 +184,45 @@ card-mod-battery-runtime-calculator:
   --battery-color-low: "#ff4444"
   --battery-color-medium: "#ffaa00"
   --battery-color-high: "#44ff44"
+```
+
+## Integration Examples
+
+### With LuxPower (Recommended)
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.luxpower_battery_soc
+power_entity: sensor.luxpower_load_power
+generation_entity: sensor.luxpower_solar_power
+grid_charging_entity: sensor.luxpower_grid_power
+battery_charging_entity: sensor.luxpower_battery_charge_power
+battery_discharging_entity: sensor.luxpower_battery_discharge_power
+battery_capacity: 23.8
+```
+
+### With SolarEdge
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.solaredge_battery_level
+power_entity: sensor.solaredge_consumption
+battery_capacity: 13.5
+```
+
+### With Tesla Powerwall
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.powerwall_battery_level
+power_entity: sensor.powerwall_load
+battery_capacity: 13.5
+```
+
+### With Generic Battery Monitor
+```yaml
+type: custom:battery-runtime-calculator
+battery_entity: sensor.battery_percentage
+power_entity: sensor.total_power_usage
+battery_capacity: 10.0
+name: "Backup Battery Status"
 ```
 
 ## Support

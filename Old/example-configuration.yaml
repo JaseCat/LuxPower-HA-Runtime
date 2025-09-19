@@ -16,18 +16,13 @@ lovelace:
 
 # Advanced configuration with all options
 - type: custom:battery-runtime-calculator
-  name: "House Battery Status"
+  name: "Home Battery Status"
   battery_entity: sensor.battery_level
   power_entity: sensor.home_power_consumption
-  generation_entity: sensor.solar_power
-  grid_charging_entity: sensor.grid_power
-  battery_charging_entity: sensor.battery_charge_power
-  battery_discharging_entity: sensor.battery_discharge_power
   battery_capacity: 13.5  # kWh
   show_power: true
   show_capacity: true
   show_runtime: true
-  show_charge_time: true
   update_interval: 30
 
 # Minimal configuration (only runtime)
@@ -39,17 +34,6 @@ lovelace:
   show_runtime: true
 
 # Example with different battery systems
-
-# LuxPower integration (Recommended)
-- type: custom:battery-runtime-calculator
-  name: "LuxPower Battery"
-  battery_entity: sensor.luxpower_battery_soc
-  power_entity: sensor.luxpower_load_power
-  generation_entity: sensor.luxpower_solar_power
-  grid_charging_entity: sensor.luxpower_grid_power
-  battery_charging_entity: sensor.luxpower_battery_charge_power
-  battery_discharging_entity: sensor.luxpower_battery_discharge_power
-  battery_capacity: 23.8
 
 # SolarEdge integration
 - type: custom:battery-runtime-calculator

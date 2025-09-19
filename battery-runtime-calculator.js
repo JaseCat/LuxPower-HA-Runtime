@@ -74,6 +74,37 @@ class BatteryRuntimeCalculator extends HTMLElement {
       }
     }
     
+    // Check if battery is actually charging by looking at battery power flow
+    // If we have a battery power entity, use that to determine charging state
+    if (this._config.battery_power_entity) {
+      const batteryPowerState = this._hass.states[this._config.battery_power_entity];
+      if (batteryPowerState) {
+        const batteryPower = parseFloat(batteryPowerState.state) || 0;
+        // Positive battery power = discharging, negative = charging
+        this._isCharging = batteryPower < 0;
+      }
+    }
+    
+    // Alternative: Check for separate charging/discharging entities
+    if (this._config.battery_charging_entity) {
+      const chargingState = this._hass.states[this._config.battery_charging_entity];
+      if (chargingState) {
+        const chargingPower = parseFloat(chargingState.state) || 0;
+        // Some systems show 0 for charging, so we'll set charging to true if discharging is 0
+        this._isCharging = chargingPower > 0;
+      }
+    }
+    
+    if (this._config.battery_discharging_entity) {
+      const dischargingState = this._hass.states[this._config.battery_discharging_entity];
+      if (dischargingState) {
+        const dischargingPower = parseFloat(dischargingState.state) || 0;
+        // Use discharging as primary indicator: if discharging > 0, not charging
+        this._isCharging = dischargingPower <= 0;
+      }
+    }
+    
+    
     // Try to get battery capacity from attributes
     this._batteryCapacity = batteryState.attributes.capacity || 
                           batteryState.attributes.battery_capacity || 
@@ -81,7 +112,11 @@ class BatteryRuntimeCalculator extends HTMLElement {
                           0;
 
     // Determine if battery is charging
-    this._isCharging = (this._powerGeneration + this._gridCharging) > 0;
+    // If we don't have any battery power entities, fall back to calculating from power flows
+    if (!this._config.battery_power_entity && !this._config.battery_charging_entity && !this._config.battery_discharging_entity) {
+      // Battery is charging if there's net charging power (solar + grid) after house consumption
+      this._isCharging = (this._powerGeneration + this._gridCharging) > 0;
+    }
     
     // Calculate runtime and charge time
     this.calculateRuntime();
@@ -91,7 +126,7 @@ class BatteryRuntimeCalculator extends HTMLElement {
   }
 
   calculateRuntime() {
-    if (this._batteryCapacity <= 0 || this._powerConsumption <= 0) {
+    if (this._batteryCapacity <= 0) {
       this._runtime = 0;
       return;
     }
@@ -99,11 +134,31 @@ class BatteryRuntimeCalculator extends HTMLElement {
     // Calculate available energy (kWh)
     const availableEnergy = (this._batteryLevel / 100) * this._batteryCapacity;
     
-    // Convert power consumption from watts to kilowatts
-    const powerConsumptionKW = this._powerConsumption / 1000;
+    // Use battery discharge power if available, otherwise fall back to house consumption
+    let dischargePower = 0;
+    
+    if (this._config.battery_discharging_entity) {
+      const dischargingState = this._hass.states[this._config.battery_discharging_entity];
+      if (dischargingState) {
+        dischargePower = parseFloat(dischargingState.state) || 0;
+      }
+    }
+    
+    // If no battery discharge power, use house consumption as fallback
+    if (dischargePower <= 0) {
+      dischargePower = this._powerConsumption;
+    }
+    
+    if (dischargePower <= 0) {
+      this._runtime = 0;
+      return;
+    }
+    
+    // Convert discharge power from watts to kilowatts
+    const dischargePowerKW = dischargePower / 1000;
     
     // Calculate runtime in hours
-    const runtimeHours = availableEnergy / powerConsumptionKW;
+    const runtimeHours = availableEnergy / dischargePowerKW;
     
     // Store runtime in hours
     this._runtime = runtimeHours;
@@ -183,8 +238,27 @@ class BatteryRuntimeCalculator extends HTMLElement {
     const powerFormatted = this.formatPower(this._powerConsumption);
     const generationFormatted = this.formatPower(this._powerGeneration);
     const gridChargingFormatted = this.formatPower(this._gridCharging);
-    const totalChargingFormatted = this.formatPower(this._powerGeneration + this._gridCharging);
     const capacityFormatted = this._batteryCapacity > 0 ? `${this._batteryCapacity} kWh` : 'Unknown';
+    
+    // Get actual battery charging power for display
+    let batteryChargingPower = 0;
+    if (this._config.battery_charging_entity) {
+      const chargingState = this._hass.states[this._config.battery_charging_entity];
+      if (chargingState) {
+        batteryChargingPower = parseFloat(chargingState.state) || 0;
+      }
+    }
+    const batteryChargingFormatted = this.formatPower(batteryChargingPower);
+    
+    // Get battery discharge power for display
+    let batteryDischargePower = 0;
+    if (this._config.battery_discharging_entity) {
+      const dischargingState = this._hass.states[this._config.battery_discharging_entity];
+      if (dischargingState) {
+        batteryDischargePower = parseFloat(dischargingState.state) || 0;
+      }
+    }
+    const batteryDischargeFormatted = this.formatPower(batteryDischargePower);
     
     // Determine battery status color
     let batteryColor = '#4CAF50'; // Green
@@ -366,12 +440,19 @@ class BatteryRuntimeCalculator extends HTMLElement {
           <div class="stats-grid">
             ${this._config.show_power ? `
               <div class="stat-item">
-                <div class="stat-label">Power Usage</div>
+                <div class="stat-label">House Usage</div>
                 <div class="stat-value">${powerFormatted}</div>
               </div>
             ` : ''}
             
-            ${this._config.generation_entity && this._isCharging ? `
+            ${this._config.battery_discharging_entity && !this._isCharging ? `
+              <div class="stat-item">
+                <div class="stat-label">Battery Discharge</div>
+                <div class="stat-value">${batteryDischargeFormatted}</div>
+              </div>
+            ` : ''}
+            
+            ${this._config.generation_entity ? `
               <div class="stat-item">
                 <div class="stat-label">Solar</div>
                 <div class="stat-value">${generationFormatted}</div>
@@ -385,10 +466,10 @@ class BatteryRuntimeCalculator extends HTMLElement {
               </div>
             ` : ''}
             
-            ${(this._config.generation_entity || this._config.grid_charging_entity) && this._isCharging ? `
+            ${this._config.battery_charging_entity && this._isCharging ? `
               <div class="stat-item">
-                <div class="stat-label">Total Charge</div>
-                <div class="stat-value">${totalChargingFormatted}</div>
+                <div class="stat-label">Battery Charge</div>
+                <div class="stat-value">${batteryChargingFormatted}</div>
               </div>
             ` : ''}
             
