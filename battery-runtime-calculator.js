@@ -8,6 +8,7 @@ class BatteryRuntimeCalculator extends HTMLElement {
     this._powerConsumption = 0;
     this._powerGeneration = 0;
     this._gridCharging = 0;
+    this._gridPower = 0;
     this._runtime = 0;
     this._chargeTime = 0;
     this._isCharging = false;
@@ -62,15 +63,15 @@ class BatteryRuntimeCalculator extends HTMLElement {
       }
     }
     
-    // Get grid charging power if available
+    // Get grid power if available (can be positive for export, negative for import)
     if (this._config.grid_charging_entity) {
       const gridChargingState = this._hass.states[this._config.grid_charging_entity];
       if (gridChargingState) {
-        // Grid power is typically negative when charging battery
-        // We need to subtract house consumption to get net charging power
+        // Grid power: negative = importing (charging), positive = exporting (selling)
         const gridPower = parseFloat(gridChargingState.state) || 0;
         const netGridCharging = Math.abs(gridPower) - this._powerConsumption;
         this._gridCharging = Math.max(0, netGridCharging); // Only positive charging power
+        this._gridPower = gridPower; // Store raw grid power for display
       }
     }
     
@@ -239,6 +240,25 @@ class BatteryRuntimeCalculator extends HTMLElement {
     const generationFormatted = this.formatPower(this._powerGeneration);
     const gridChargingFormatted = this.formatPower(this._gridCharging);
     const capacityFormatted = this._batteryCapacity > 0 ? `${this._batteryCapacity} kWh` : 'Unknown';
+    
+    // Format grid power with appropriate label
+    let gridPowerFormatted = '';
+    let gridPowerLabel = '';
+    if (this._config.grid_charging_entity) {
+      if (this._gridPower < 0) {
+        // Negative = importing from grid
+        gridPowerFormatted = this.formatPower(Math.abs(this._gridPower));
+        gridPowerLabel = 'Grid Import';
+      } else if (this._gridPower > 0) {
+        // Positive = exporting to grid
+        gridPowerFormatted = this.formatPower(this._gridPower);
+        gridPowerLabel = 'Grid Export';
+      } else {
+        // Zero = no grid interaction
+        gridPowerFormatted = '0 W';
+        gridPowerLabel = 'Grid';
+      }
+    }
     
     // Get actual battery charging power for display
     let batteryChargingPower = 0;
@@ -459,10 +479,10 @@ class BatteryRuntimeCalculator extends HTMLElement {
               </div>
             ` : ''}
             
-            ${this._config.grid_charging_entity && this._isCharging ? `
+            ${this._config.grid_charging_entity ? `
               <div class="stat-item">
-                <div class="stat-label">Grid Charge</div>
-                <div class="stat-value">${gridChargingFormatted}</div>
+                <div class="stat-label">${gridPowerLabel}</div>
+                <div class="stat-value">${gridPowerFormatted}</div>
               </div>
             ` : ''}
             
