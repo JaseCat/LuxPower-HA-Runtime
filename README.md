@@ -18,7 +18,9 @@ A custom Home Assistant card that calculates and displays battery runtime and ch
 
 Here's how the card looks with all components enabled:
 
-![House Battery Runtime Calculator - Full View](screenshot-full-card.png)
+
+<img width="458" height="302" alt="image" src="https://github.com/user-attachments/assets/da90f48e-bca9-4d50-ab4b-deef1283490d" />
+
 
 *Example showing a fully charged battery system with solar generation, grid export, and all monitoring components active.*
 
