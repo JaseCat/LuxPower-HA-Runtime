@@ -25,10 +25,20 @@ class BatteryRuntimeCalculator extends HTMLElement {
     
     this._config = {
       name: 'House Battery',
-      show_power: true,
+      show_title: true,
+      show_battery_icon: true,
+      show_battery_percentage: true,
       show_capacity: true,
+      show_power: true,
       show_runtime: true,
       show_charge_time: true,
+      show_house_usage: true,
+      show_battery_discharge: true,
+      show_battery_charge: true,
+      show_solar: true,
+      show_grid_power: true,
+      show_battery_graph: true,
+      show_last_update: true,
       update_interval: 30,
       ...config
     };
@@ -292,51 +302,51 @@ class BatteryRuntimeCalculator extends HTMLElement {
       <style>
         :host {
           display: block;
-          padding: 16px;
+          padding: 8px;
           font-family: var(--ha-card-header-font-family, inherit);
         }
         
         .card {
           background: var(--card-background-color, #fff);
-          border-radius: var(--ha-card-border-radius, 12px);
-          box-shadow: var(--ha-card-box-shadow, 0 2px 8px rgba(0,0,0,0.1));
+          border-radius: var(--ha-card-border-radius, 8px);
+          box-shadow: var(--ha-card-box-shadow, 0 1px 4px rgba(0,0,0,0.1));
           overflow: hidden;
         }
         
         .header {
-          padding: 16px 16px 0 16px;
-          font-size: 16px;
+          padding: 8px 8px 0 8px;
+          font-size: 12px;
           font-weight: 500;
           color: var(--primary-text-color, #000);
         }
         
         .content {
-          padding: 16px;
+          padding: 8px;
         }
         
         .battery-container {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 16px;
+          margin-bottom: 10px;
         }
         
         .battery-icon {
-          width: 40px;
-          height: 20px;
+          width: 30px;
+          height: 15px;
           border: 2px solid var(--primary-text-color, #000);
-          border-radius: 3px;
+          border-radius: 2px;
           position: relative;
-          margin-right: 12px;
+          margin-right: 8px;
         }
         
         .battery-icon::after {
           content: '';
           position: absolute;
-          right: -4px;
-          top: 4px;
+          right: -3px;
+          top: 3px;
           width: 2px;
-          height: 8px;
+          height: 6px;
           background: var(--primary-text-color, #000);
           border-radius: 0 1px 1px 0;
         }
@@ -350,7 +360,7 @@ class BatteryRuntimeCalculator extends HTMLElement {
         }
         
         .battery-text {
-          font-size: 18px;
+          font-size: 14px;
           font-weight: 600;
           color: var(--primary-text-color, #000);
         }
@@ -361,7 +371,7 @@ class BatteryRuntimeCalculator extends HTMLElement {
         }
         
         .battery-capacity {
-          font-size: 18px;
+          font-size: 14px;
           font-weight: 600;
           color: var(--secondary-text-color, #666);
         }
@@ -369,147 +379,198 @@ class BatteryRuntimeCalculator extends HTMLElement {
         .stats-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
-          margin-bottom: 16px;
+          gap: 8px;
+          margin-bottom: 10px;
         }
+        
         
         .stat-item {
           text-align: center;
-          padding: 12px;
+          padding: 8px;
           background: var(--divider-color, #f0f0f0);
-          border-radius: 8px;
+          border-radius: 6px;
         }
         
         .stat-label {
-          font-size: 12px;
+          font-size: 10px;
           color: var(--secondary-text-color, #666);
-          margin-bottom: 4px;
+          margin-bottom: 2px;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.3px;
         }
         
         .stat-value {
-          font-size: 16px;
+          font-size: 12px;
           font-weight: 600;
           color: var(--primary-text-color, #000);
         }
         
+        .battery-graph {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 6px;
+        }
+        
+        .battery-graph-bar {
+          flex: 1;
+          height: 12px;
+          background: var(--divider-color, #e0e0e0);
+          border-radius: 6px;
+          overflow: hidden;
+          position: relative;
+        }
+        
+        .battery-graph-fill {
+          height: 100%;
+          background: ${batteryColor};
+          border-radius: 6px;
+          transition: width 0.3s ease;
+          width: ${batteryPercentage}%;
+        }
+        
+        .battery-graph-text {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--primary-text-color, #000);
+          min-width: 35px;
+          text-align: right;
+        }
+        
         .runtime-display {
           text-align: center;
-          padding: 16px;
+          padding: 10px;
           background: linear-gradient(135deg, ${batteryColor}20, ${batteryColor}10);
-          border-radius: 8px;
+          border-radius: 6px;
           border: 1px solid ${batteryColor}40;
         }
         
         .runtime-label {
-          font-size: 14px;
+          font-size: 11px;
           color: var(--secondary-text-color, #666);
-          margin-bottom: 8px;
+          margin-bottom: 4px;
         }
         
         .runtime-value {
-          font-size: 24px;
+          font-size: 18px;
           font-weight: 700;
           color: ${batteryColor};
         }
         
         .last-update {
           text-align: center;
-          font-size: 11px;
+          font-size: 9px;
           color: var(--secondary-text-color, #999);
-          margin-top: 12px;
+          margin-top: 8px;
         }
         
         .warning {
           background: #fff3cd;
           border: 1px solid #ffeaa7;
           color: #856404;
-          padding: 8px 12px;
+          padding: 6px 8px;
           border-radius: 4px;
-          font-size: 12px;
-          margin-bottom: 12px;
+          font-size: 10px;
+          margin-bottom: 8px;
         }
         
         .error {
           background: #f8d7da;
           border: 1px solid #f5c6cb;
           color: #721c24;
-          padding: 8px 12px;
+          padding: 6px 8px;
           border-radius: 4px;
-          font-size: 12px;
-          margin-bottom: 12px;
+          font-size: 10px;
+          margin-bottom: 8px;
         }
       </style>
       
       <div class="card">
-        <div class="header">${this._config.name}</div>
+        ${this._config.show_title ? `<div class="header">${this._config.name}</div>` : ''}
         <div class="content">
           ${this.renderWarnings()}
           
           <div class="battery-container">
             <div class="battery-left">
-              <div class="battery-icon">
-                <div class="battery-fill"></div>
-              </div>
-              <div class="battery-text">${batteryPercentage}%</div>
+              ${this._config.show_battery_icon ? `
+                <div class="battery-icon">
+                  <div class="battery-fill"></div>
+                </div>
+              ` : ''}
+              ${this._config.show_battery_percentage ? `
+                <div class="battery-text">${batteryPercentage}%</div>
+              ` : ''}
             </div>
-            <div class="battery-capacity">${capacityFormatted}</div>
+            ${this._config.show_capacity ? `
+              <div class="battery-capacity">${capacityFormatted}</div>
+            ` : ''}
           </div>
           
           <div class="stats-grid">
-            ${this._config.show_power ? `
+            ${this._config.show_house_usage ? `
               <div class="stat-item">
                 <div class="stat-label">House Usage</div>
                 <div class="stat-value">${powerFormatted}</div>
               </div>
             ` : ''}
             
-            ${this._config.battery_discharging_entity && !this._isCharging ? `
+            ${this._config.show_battery_discharge && this._config.battery_discharging_entity && !this._isCharging ? `
               <div class="stat-item">
                 <div class="stat-label">Battery Discharge</div>
                 <div class="stat-value">${batteryDischargeFormatted}</div>
               </div>
             ` : ''}
             
-            ${this._config.generation_entity ? `
+            ${this._config.show_solar && this._config.generation_entity ? `
               <div class="stat-item">
                 <div class="stat-label">Solar</div>
                 <div class="stat-value">${generationFormatted}</div>
               </div>
             ` : ''}
             
-            ${this._config.grid_charging_entity ? `
+            ${this._config.show_grid_power && this._config.grid_charging_entity ? `
               <div class="stat-item">
                 <div class="stat-label">${gridPowerLabel}</div>
                 <div class="stat-value">${gridPowerFormatted}</div>
               </div>
             ` : ''}
             
-            ${this._config.battery_charging_entity && this._isCharging ? `
+            ${this._config.show_battery_charge && this._config.battery_charging_entity && this._isCharging ? `
               <div class="stat-item">
                 <div class="stat-label">Battery Charge</div>
                 <div class="stat-value">${batteryChargingFormatted}</div>
               </div>
             ` : ''}
             
+            ${this._config.show_runtime && !this._isCharging ? `
+              <div class="runtime-display">
+                <div class="runtime-label">Battery Runtime Remaining</div>
+                <div class="runtime-value">${runtimeFormatted}</div>
+              </div>
+            ` : ''}
+            
+            ${this._config.show_charge_time && this._isCharging && (this._config.generation_entity || this._config.grid_charging_entity) ? `
+              <div class="runtime-display" style="background: linear-gradient(135deg, #2196F320, #2196F310); border-color: #2196F340;">
+                <div class="runtime-label">Battery Charge Time Remaining</div>
+                <div class="runtime-value" style="color: #2196F3;">${chargeTimeFormatted}</div>
+              </div>
+            ` : ''}
+            
+            ${this._config.show_battery_graph ? `
+              <div class="stat-item">
+                <div class="stat-label">Battery Level</div>
+                <div class="battery-graph">
+                  <div class="battery-graph-bar">
+                    <div class="battery-graph-fill"></div>
+                  </div>
+                  <div class="battery-graph-text">${batteryPercentage}%</div>
+                </div>
+              </div>
+            ` : ''}
+            
           </div>
           
-          ${this._config.show_runtime && !this._isCharging ? `
-            <div class="runtime-display">
-              <div class="runtime-label">Estimated Runtime</div>
-              <div class="runtime-value">${runtimeFormatted}</div>
-            </div>
-          ` : ''}
-          
-          ${this._config.show_charge_time && this._isCharging && (this._config.generation_entity || this._config.grid_charging_entity) ? `
-            <div class="runtime-display" style="background: linear-gradient(135deg, #2196F320, #2196F310); border-color: #2196F340;">
-              <div class="runtime-label">Charge Time Remaining</div>
-              <div class="runtime-value" style="color: #2196F3;">${chargeTimeFormatted}</div>
-            </div>
-          ` : ''}
-          
-          ${this._lastUpdate ? `
+          ${this._config.show_last_update && this._lastUpdate ? `
             <div class="last-update">
               Last updated: ${this._lastUpdate.toLocaleTimeString()}
             </div>
@@ -537,6 +598,7 @@ class BatteryRuntimeCalculator extends HTMLElement {
     
     return warnings.join('');
   }
+
 
   connectedCallback() {
     if (this._config.update_interval > 0) {
