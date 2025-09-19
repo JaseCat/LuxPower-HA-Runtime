@@ -1,4 +1,4 @@
-# House Battery Runtime Calculator for Home Assistant
+# House Battery Runtime & Charge Calculator for Home Assistant
 
 A custom Home Assistant card that calculates and displays battery runtime and charge time for home battery systems. Perfect for monitoring your home battery backup system during power outages or when running off-grid.
 
